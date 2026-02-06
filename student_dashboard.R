@@ -69,62 +69,59 @@ subjects_data <- unique(student_data[, .(subject)])
 grade_trends <- ggplot() +
   theme_bw() +
   theme(
-    panel.margin = grid::unit(1, "lines"),
     legend.position = "right",
     text = element_text(size = 14),
     axis.text = element_text(size = 12),
     plot.title = element_text(size = 16, face = "bold"),
     legend.text = element_text(size = 12),
-    legend.title = element_text(size = 12)
+    legend.title = element_text(size = 12),
+    plot.margin = margin(5, 5, 5, 5)
   ) +
-  theme_animint(width = 1400, height = 420) +
-  geom_tallrect(aes(
-    xmin = sem_num - 0.5,
-    xmax = sem_num + 0.5),
+  theme_animint(
+    width = 1360,
+    height = 420,
+    colspan = 2,
+    last_in_row = TRUE
+  ) +
+  geom_tallrect(
+    aes(xmin = sem_num - 0.5, xmax = sem_num + 0.5),
     clickSelects = "semester",
     data = semesters_data,
-    alpha = 0.2) +
-  geom_line(aes(
-    x = sem_num,
-    y = grade,
-    group = interaction(student_id, subject),
-    color = subject),
+    alpha = 0.2
+  ) +
+  geom_line(
+    aes(x = sem_num, y = grade,
+        group = interaction(student_id, subject),
+        color = subject),
     clickSelects = "student_id",
     data = student_data,
     size = 0.8,
-    alpha = 0.1) +
-  geom_point(aes(
-    x = sem_num,
-    y = grade,
-    color = subject,
-    size = study_hours,
-    key = paste(student_id, subject, semester),
-    tooltip = paste0(
-      "Student: ", student_id, "\n",
-      "Subject: ", subject, "\n",
-      "Semester: ", semester, "\n",
-      "Grade: ", grade, "%\n",
-      "Study Hours: ", study_hours, "\n",
-      "Attendance: ", attendance, "%")),
+    alpha = 0.1
+  ) +
+  geom_point(
+    aes(
+      x = sem_num, y = grade,
+      color = subject, size = study_hours,
+      key = paste(student_id, subject, semester),
+      tooltip = paste0(
+        "Student: ", student_id, "\n",
+        "Subject: ", subject, "\n",
+        "Semester: ", semester, "\n",
+        "Grade: ", grade, "%\n",
+        "Study Hours: ", study_hours, "\n",
+        "Attendance: ", attendance, "%"
+      )
+    ),
     showSelected = "student_id",
     clickSelects = "subject",
     data = student_data,
-    alpha = 0.7) +
-  geom_text(aes(
-    x = sem_num,
-    y = grade,
-    label = round(grade, 0),
-    key = paste(student_id, subject, semester)),
-    showSelected = "student_id",
-    data = student_data,
-    size = 3.5,
-    vjust = -1.2) +
+    alpha = 0.7
+  ) +
   scale_size_continuous(range = c(3, 10), name = "Study Hours/Week") +
+  scale_x_continuous(breaks = 1:8, labels = paste0("Sem", 1:8)) +
   ggtitle("Student Grade Progression Over Semesters") +
   xlab("Semester") +
-  ylab("Grade (%)") +
-  scale_x_continuous(breaks = 1:8, labels = paste0("Sem", 1:8))
-
+  ylab("Grade (%)")
 # plot 2 - how study hours relate to grades, point size is attendance
 study_scatter <- ggplot() +
   theme_bw() +
@@ -132,45 +129,40 @@ study_scatter <- ggplot() +
     text = element_text(size = 14),
     axis.text = element_text(size = 12),
     plot.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 12),
-    legend.title = element_text(size = 12)
+    plot.margin = margin(5, 5, 5, 5)
   ) +
   theme_animint(width = 680, height = 380) +
-  geom_point(aes(
-    x = study_hours,
-    y = grade,
-    color = subject),
+  geom_point(
+    aes(x = study_hours, y = grade, color = subject),
     data = student_data,
     alpha = 0.08,
-    size = 1) +
-  geom_point(aes(
-    x = study_hours,
-    y = grade,
-    color = subject,
-    size = attendance,
-    key = paste(student_id, subject, semester),
-    tooltip = paste0(
-      "Student: ", student_id, "\n",
-      "Subject: ", subject, "\n",
-      "Grade: ", grade, "%\n",
-      "Study Hours: ", study_hours, "\n",
-      "Attendance: ", attendance, "%\n",
-      "Performance: ", performance_category)),
+    size = 1
+  ) +
+  geom_point(
+    aes(
+      x = study_hours, y = grade,
+      color = subject, size = attendance,
+      key = paste(student_id, subject, semester),
+      tooltip = paste0(
+        "Student: ", student_id, "\n",
+        "Subject: ", subject, "\n",
+        "Grade: ", grade, "%\n",
+        "Study Hours: ", study_hours, "\n",
+        "Attendance: ", attendance, "%"
+      )
+    ),
     showSelected = "semester",
     clickSelects = c("student_id", "subject"),
     data = student_data,
-    alpha = 0.6) +
-  geom_smooth(aes(
-    x = study_hours,
-    y = grade,
-    color = subject),
+    alpha = 0.6
+  ) +
+  geom_smooth(
+    aes(x = study_hours, y = grade, color = subject),
     showSelected = "semester",
     data = student_data,
     method = "lm",
-    se = FALSE,
-    size = 1.5,
-    alpha = 0.5) +
-  scale_size_continuous(range = c(2, 12), name = "Attendance %") +
+    se = FALSE
+  ) +
   ggtitle("Study Hours vs Grade") +
   xlab("Weekly Study Hours") +
   ylab("Grade (%)")
@@ -188,41 +180,32 @@ subject_summary <- student_data[, .(
 subject_comparison <- ggplot() +
   theme_bw() +
   theme(
-    text = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    axis.text.x = element_text(angle = 35, hjust = 1, size = 11),
+    axis.text.x = element_text(angle = 35, hjust = 1),
     plot.title = element_text(size = 16, face = "bold"),
+    plot.margin = margin(5, 5, 5, 5),
     legend.position = "none"
   ) +
-  theme_animint(width = 680, height = 380) +
-  geom_bar(aes(
-    x = subject,
-    y = mean_grade,
-    fill = subject,
-    key = subject,
-    tooltip = paste0(
-      "Subject: ", subject, "\n",
-      "Semester: ", semester, "\n",
-      "Mean: ", round(mean_grade, 1), "%\n",
-      "Median: ", round(median_grade, 1), "%\n",
-      "Range: ", round(min_grade, 1), "-", round(max_grade, 1), "%\n",
-      "Students: ", count)),
+  theme_animint(
+    width = 680,
+    height = 380,
+    last_in_row = TRUE
+  ) +
+  geom_bar(
+    aes(x = subject, y = mean_grade, fill = subject, key = subject),
     showSelected = "semester",
     clickSelects = "subject",
     data = subject_summary,
     stat = "identity",
-    alpha = 0.7) +
-  geom_point(aes(
-    x = subject,
-    y = grade,
-    color = subject,
-    key = paste(student_id, subject)),
+    alpha = 0.7
+  ) +
+  geom_point(
+    aes(x = subject, y = grade, color = subject),
     showSelected = "semester",
     clickSelects = "subject",
     data = student_data,
     alpha = 0.25,
-    size = 2,
-    position = position_jitter(width = 0.2, height = 0)) +
+    position = position_jitter(width = 0.2)
+  ) +
   ggtitle("Subject Performance Comparison") +
   xlab("Subject") +
   ylab("Grade (%)")
@@ -241,28 +224,22 @@ top_students <- student_avg[, .SD[order(-avg_grade)][1:15], by = semester]
 ranking_plot <- ggplot() +
   theme_bw() +
   theme(
-    text = element_text(size = 14),
-    axis.text = element_text(size = 11),
     plot.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 12),
-    legend.title = element_text(size = 12)
+    plot.margin = margin(5, 5, 5, 5)
   ) +
   theme_animint(width = 680, height = 380) +
-  geom_bar(aes(
-    x = reorder(student_id, avg_grade),
-    y = avg_grade,
-    fill = avg_grade,
-    key = student_id,
-    tooltip = paste0(
-      "Student: ", student_id, "\n",
-      "Avg Grade: ", round(avg_grade, 1), "%\n",
-      "Study Hours: ", total_study_hours, "\n",
-      "Attendance: ", round(avg_attendance, 1), "%")),
+  geom_bar(
+    aes(
+      x = reorder(student_id, avg_grade),
+      y = avg_grade,
+      fill = avg_grade,
+      key = student_id
+    ),
     showSelected = "semester",
     clickSelects = "student_id",
     data = top_students,
-    stat = "identity") +
-  scale_fill_gradient(low = "orange", high = "darkgreen", name = "Avg Grade") +
+    stat = "identity"
+  ) +
   coord_flip() +
   ggtitle("Top 15 Students") +
   xlab("Student ID") +
@@ -279,29 +256,28 @@ attendance_bins <- student_data[, .(
 attendance_plot <- ggplot() +
   theme_bw() +
   theme(
-    text = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    axis.text.x = element_text(angle = 35, hjust = 1, size = 11),
+    axis.text.x = element_text(angle = 35, hjust = 1),
     plot.title = element_text(size = 16, face = "bold"),
-    legend.text = element_text(size = 12),
-    legend.title = element_text(size = 12)
+    plot.margin = margin(5, 5, 5, 5)
   ) +
-  theme_animint(width = 680, height = 380) +
-  geom_bar(aes(
-    x = attendance_bin,
-    y = avg_grade,
-    fill = subject,
-    key = paste(attendance_bin, subject),
-    tooltip = paste0(
-      "Attendance: ", attendance_bin, "\n",
-      "Subject: ", subject, "\n",
-      "Avg Grade: ", round(avg_grade, 1), "%\n",
-      "Students: ", count)),
+  theme_animint(
+    width = 680,
+    height = 380,
+    last_in_row = TRUE
+  ) +
+  geom_bar(
+    aes(
+      x = attendance_bin,
+      y = avg_grade,
+      fill = subject,
+      key = paste(attendance_bin, subject)
+    ),
     showSelected = "semester",
     clickSelects = "subject",
     data = attendance_bins[!is.na(attendance_bin)],
     stat = "identity",
-    position = "dodge") +
+    position = "dodge"
+  ) +
   ggtitle("Attendance Impact on Grades") +
   xlab("Attendance Range (%)") +
   ylab("Average Grade (%)")
